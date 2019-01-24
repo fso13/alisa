@@ -1,5 +1,8 @@
 package ru.drudenko.alisa.controller;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -21,8 +24,7 @@ import ru.drudenko.alisa.model.Otp;
 import ru.drudenko.alisa.repository.ClientRepository;
 import ru.drudenko.alisa.repository.OtpRepository;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.StringWriter;
 
 @RestController
 @RequestMapping(value = "/oauth", produces = MediaType.ALL_VALUE)
@@ -37,19 +39,22 @@ public class OauthController {
     private final RestTemplate yandexRestTemplate;
     private final OtpRepository otpRepository;
     private final ClientRepository clientRepository;
+    private final VelocityEngine velocityEngine;
 
     @Autowired
     public OauthController(RestTemplate yandexRestTemplate,
                            OtpRepository otpRepository,
-                           ClientRepository clientRepository) {
+                           ClientRepository clientRepository,
+                           VelocityEngine velocityEngine) {
 
         this.yandexRestTemplate = yandexRestTemplate;
         this.otpRepository = otpRepository;
         this.clientRepository = clientRepository;
+        this.velocityEngine = velocityEngine;
     }
 
-    @GetMapping(value = "/yandex")
-    void yandex(HttpServletResponse response, @RequestParam(name = "state") String state, @RequestParam(name = "code") String code) throws IOException {
+    @GetMapping(value = "/yandex", produces = {"text/html;charset=UTF-8"})
+    ResponseEntity yandex(@RequestParam(name = "state") String state, @RequestParam(name = "code") String code) {
 
         String token = getToken(code);
 
@@ -63,8 +68,16 @@ public class OauthController {
         String otpByClient = String.valueOf(100000 + (long) (Math.random() * (999999 - 100000)));
         newOtp.setValue(otpByClient);
         otpRepository.save(newOtp);
-        response.setContentType("text/plain; charset=utf-8");
-        response.getWriter().println("Скажите Алисе код :" + otpByClient + ", в течении минуты.");
+
+        Template t = velocityEngine.getTemplate("src/main/resources/templates/code.html", "utf-8");
+        VelocityContext context = new VelocityContext();
+        context.put("otpByClient", otpByClient);
+        StringWriter writer = new StringWriter();
+        t.merge(context, writer);
+
+        return ResponseEntity
+                .ok()
+                .body(writer.toString());
     }
 
     private String getToken(String code) {

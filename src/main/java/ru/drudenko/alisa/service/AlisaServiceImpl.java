@@ -1,9 +1,18 @@
 package ru.drudenko.alisa.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import ru.drudenko.alisa.dto.dialog.req.Command;
 import ru.drudenko.alisa.dto.dialog.req.Entity;
+import ru.drudenko.alisa.dto.passport.Passport;
 import ru.drudenko.alisa.model.Client;
 import ru.drudenko.alisa.model.Otp;
 import ru.drudenko.alisa.repository.ClientRepository;
@@ -19,14 +28,18 @@ public class AlisaServiceImpl implements AlisaService {
 
     private final ClientRepository clientRepository;
     private final OtpRepository otpRepository;
+    private final RestTemplate restTemplate;
 
     private static final List<String> TOKENS_STEP1 = Arrays.asList("привяжи", "устройство");
     private static final List<String> TOKENS_STEP3 = Arrays.asList("привяжи", "учетку");
+    private static final List<String> WHAT_IS_MY_NAME1 = Arrays.asList("как", "меня", "зовут");
+    private static final List<String> WHAT_IS_MY_NAME2 = Arrays.asList("скажи", "мое", "имя");
 
     @Autowired
-    public AlisaServiceImpl(ClientRepository clientRepository, OtpRepository otpRepository) {
+    public AlisaServiceImpl(ClientRepository clientRepository, OtpRepository otpRepository, final RestTemplate restTemplate) {
         this.clientRepository = clientRepository;
         this.otpRepository = otpRepository;
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -45,7 +58,29 @@ public class AlisaServiceImpl implements AlisaService {
                     .collect(Collectors.toList()));
             return step3(command.getSession().getUserId(), code);
         }
+
+        if (tokens.containsAll(WHAT_IS_MY_NAME1) || tokens.containsAll(WHAT_IS_MY_NAME2)) {
+            return whatIsMyName(command.getSession().getUserId());
+        }
         return "Что то не понятное.";
+    }
+
+    private String whatIsMyName(String clientId) {
+        Client client = clientRepository.findByClientId(clientId).orElseThrow(RuntimeException::new);
+
+
+        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "OAuth " + client.getPersonId());
+
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
+        ResponseEntity<Passport> responseEntity = restTemplate.
+                exchange("https://login.yandex.ru/info?format=json&with_openid_identity=true",
+                        HttpMethod.GET,
+                        request,
+                        ParameterizedTypeReference.forType(Passport.class));
+
+        return responseEntity.getBody().getRealName();
     }
 
     private String step1(String clientId) {
@@ -56,7 +91,7 @@ public class AlisaServiceImpl implements AlisaService {
             return client1;
         });
         clientRepository.save(client);
-        otpRepository.findByClientId(clientId).ifPresent(otpRepository::delete);
+        otpRepository.deleteByClientId(clientId);
 
         Otp otp = new Otp();
         otp.setClientId(clientId);

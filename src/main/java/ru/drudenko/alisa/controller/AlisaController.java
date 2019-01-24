@@ -22,7 +22,7 @@ public class AlisaController {
     }
 
     @PostMapping
-    Render command(@RequestBody Command command) {
+    public Render command(@RequestBody Command command) {
         System.out.println(command);
 
         String text = alisaService.getText(command);

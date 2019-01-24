@@ -1,0 +1,23 @@
+login.yandex.ru/info?format=json&with_openid_identity=true
+
+Authorization: OAuth AQAAAAACGRNXAAVyGsuzZcn5mkHXlcPMBfsICq4
+
+
+{
+ "first_name": "дима",
+ "last_name": "руденко",
+ "display_name": "dimarudenk",
+ "emails":[
+ "dimarudenk@yandex.ru"
+ ],
+ "default_email": "dimarudenk@yandex.ru",
+ "real_name": "дима руденко",
+ "birthday": "1989-06-20",
+ "openid_identities":[
+ "http://openid.yandex.ru/dimarudenk/",
+ "http://dimarudenk.ya.ru/"
+ ],
+ "login": "dimarudenk",
+ "sex": "male",
+ "id": "35197783"
+ }
