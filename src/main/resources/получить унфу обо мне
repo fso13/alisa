@@ -21,3 +21,26 @@ Authorization: OAuth AQAAAAACGRNXAAVyGsuzZcn5mkHXlcPMBfsICq4
  "sex": "male",
  "id": "35197783"
  }
+
+
+
+
+ https://accounts.google.com/o/oauth2/v2/auth?
+  scope=https://mail.google.com/&
+  access_type=offline&
+  include_granted_scopes=true&
+  state=123456&
+  redirect_uri=http://localhost:8181/oauth/google&
+  response_type=code&
+  client_id=788764317534-erfn8p6im4v4vo5i2b28c6s4emqejlav.apps.googleusercontent.com
+
+
+
+
+
+
+ POST googleapis.com/oauth2/v4/token
+
+ Content-Type: application/x-www-form-urlencoded
+
+ grant_type=authorization_code&code=4/4wBq9ds7Cxu0rAETVarvcluO_npjqeTNnCbJS66RuJthurYzTQqsRri0eDdKe_Kos1pXo0ucZARQexeF4fitPGE&client_id=788764317534-erfn8p6im4v4vo5i2b28c6s4emqejlav.apps.googleusercontent.com&client_secret=gykHUJOipdk1a5p-8A-1RYxy&redirect_uri=http://localhost:8181/oauth/google
