@@ -1,10 +1,7 @@
 package ru.drudenko.alisa.service.google;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 
 public interface GmailService {
-    void setGmailCredentials(GmailCredentials gmailCredentials);
-
-    boolean sendMessage(String recipientAddress, String subject, String body) throws MessagingException, IOException;
+    void getMessages(String token, String refresh) throws IOException;
 }

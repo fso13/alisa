@@ -1,4 +1,4 @@
-package ru.drudenko.alisa.service;
+package ru.drudenko.alisa.service.alisa;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;

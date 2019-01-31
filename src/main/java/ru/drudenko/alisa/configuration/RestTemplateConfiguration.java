@@ -6,10 +6,10 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-public class YandexRestTemplateConfiguration {
+public class RestTemplateConfiguration {
 
     @Bean
-    public RestTemplate yandexRestTemplate() {
+    public RestTemplate restTemplate() {
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
         httpRequestFactory.setConnectTimeout(5000);
         httpRequestFactory.setConnectionRequestTimeout(10000);
