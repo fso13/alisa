@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +18,7 @@ import ru.drudenko.alisa.repository.AlisaClientRepository;
 import java.util.Arrays;
 import java.util.List;
 
+@Service
 public class YandexPassportCommandServiceImpl implements CommandService {
     private static final List<String> WHAT_IS_MY_NAME1 = Arrays.asList("как", "меня", "зовут");
     private static final List<String> WHAT_IS_MY_NAME2 = Arrays.asList("скажи", "мое", "имя");
