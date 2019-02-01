@@ -99,12 +99,6 @@
             <artifactId>google-api-services-gmail</artifactId>
             <version>v1-rev82-1.23.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.oauth-clients</groupId>
-            <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.23.0</version>
-        </dependency>
-
     </dependencies>
 
     <build>
