@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,8 +52,8 @@ public class OauthController {
     }
 
     @Transactional
-    @GetMapping(produces = {"text/html;charset=UTF-8"})
-    ResponseEntity oauth(@RequestParam(name = "agent_id") String agentId,
+    @GetMapping(value = "/{agentId}", produces = {"text/html;charset=UTF-8"})
+    ResponseEntity oauth(@PathVariable("agentId") String agentId,
                          @RequestParam(name = "state") String state,
                          @RequestParam(name = "code") String code) throws Exception {
         OauthClient client = OauthClient.builder().name(agentId).build();
