@@ -22,6 +22,7 @@ import java.util.List;
 public class YandexPassportCommandServiceImpl implements CommandService {
     private static final List<String> WHAT_IS_MY_NAME1 = Arrays.asList("как", "меня", "зовут");
     private static final List<String> WHAT_IS_MY_NAME2 = Arrays.asList("скажи", "мое", "имя");
+    private static final List<String> WHAT_IS_MY_NAME3 = Arrays.asList("скажи", "моё", "имя");
     private final AlisaClientRepository alisaClientRepository;
     private final RestTemplate restTemplate = restTemplate();
 
@@ -39,7 +40,7 @@ public class YandexPassportCommandServiceImpl implements CommandService {
     @Override
     public boolean doFilter(final Command command) {
         List<String> tokens = command.getRequest().getNlu().getTokens();
-        return tokens.containsAll(WHAT_IS_MY_NAME1) || tokens.containsAll(WHAT_IS_MY_NAME2);
+        return tokens.containsAll(WHAT_IS_MY_NAME1) || tokens.containsAll(WHAT_IS_MY_NAME2) || tokens.containsAll(WHAT_IS_MY_NAME3);
     }
 
     @Override

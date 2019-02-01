@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 @Service
 public class SsoCommandServiceImpl implements SsoCommandService {
     private static final List<String> TOKENS_STEP1 = Arrays.asList("привяжи", "устройство");
-    private static final List<String> TOKENS_STEP3 = Arrays.asList("привяжи", "учетку");
+    private static final List<String> TOKENS_STEP3_1 = Arrays.asList("привяжи", "учетку");
+    private static final List<String> TOKENS_STEP3_2 = Arrays.asList("привяжи", "учётку");
 
     private final AlisaClientRepository alisaClientRepository;
     private final OtpRepository otpRepository;
@@ -50,7 +51,7 @@ public class SsoCommandServiceImpl implements SsoCommandService {
         otp.setValue(otpByClient);
         otpRepository.save(otp);
 
-        return "Зайдите на сайт бота, войдите под учетной записью Яндекс, и введите код - " + otpByClient;
+        return "Зайдите на сайт alisa-java.herokuapp.com, и введите код - " + otpByClient;
     }
 
     @Override
@@ -77,7 +78,7 @@ public class SsoCommandServiceImpl implements SsoCommandService {
     @Override
     public boolean doFilter(final Command command) {
         List<String> tokens = command.getRequest().getNlu().getTokens();
-        return tokens.containsAll(TOKENS_STEP1) || tokens.containsAll(TOKENS_STEP3);
+        return tokens.containsAll(TOKENS_STEP1) || tokens.containsAll(TOKENS_STEP3_1)||tokens.containsAll(TOKENS_STEP3_2);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class SsoCommandServiceImpl implements SsoCommandService {
         if (tokens.containsAll(TOKENS_STEP1)) {
             return step1(command.getSession().getUserId());
         }
-        if (tokens.containsAll(TOKENS_STEP3)) {
+        if (tokens.containsAll(TOKENS_STEP3_1)||tokens.containsAll(TOKENS_STEP3_2)) {
             String code = String.join("", command.getRequest().getNlu().getEntities()
                     .stream()
                     .filter(entity -> entity.getType().equals("YANDEX.NUMBER"))
