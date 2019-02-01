@@ -18,6 +18,16 @@ public class AlisaServiceImpl implements AlisaService {
 
     @Override
     public String getText(Command command) {
-        return commandServices.stream().filter(service -> service.doFilter(command)).findFirst().get().getMessage(command);
+        return commandServices.stream().filter(service -> service.doFilter(command)).findFirst().orElse(new CommandService() {
+            @Override
+            public boolean doFilter(final Command command) {
+                return false;
+            }
+
+            @Override
+            public String getMessage(final Command command) {
+                return "Что то не понятное.";
+            }
+        }).getMessage(command);
     }
 }
