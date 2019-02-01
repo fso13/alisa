@@ -4,15 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import java.time.Instant;
 
@@ -28,13 +27,12 @@ public class Otp {
     @GeneratedValue(generator = "uuid")
     private String id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private Client client;
+    @Column(name = "type")
+    @Enumerated(value = EnumType.STRING)
+    private OtpType type;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private Token token;
+    @Column(name = "ref")
+    private String ref;
 
     @Column(name = "value")
     private String value;

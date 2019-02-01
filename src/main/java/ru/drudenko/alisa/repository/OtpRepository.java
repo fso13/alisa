@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.drudenko.alisa.model.Otp;
+import ru.drudenko.alisa.model.OtpType;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,11 +14,9 @@ import java.util.Optional;
 public interface OtpRepository extends JpaRepository<Otp, String> {
 
     @Transactional
-    void deleteByClientId(String clientId);
+    void deleteByRefAndType(String clientId, OtpType type);
 
-    Optional<Otp> findByValueAndExpiredAndTokenIsNotNull(String value, boolean expired);
+    Optional<Otp> findByValueAndExpiredAndType(String value, boolean expired, OtpType type);
 
-    Optional<Otp> findByValueAndExpiredAndTokenIsNull(String value, boolean expired);
-
-    List<Otp> findByExpiredAndCreateTimeBeforeAndTokenIsNotNull(boolean expired, Instant date);
+    List<Otp> findByExpiredAndCreateTimeBeforeAndType(boolean expired, Instant date, OtpType type);
 }

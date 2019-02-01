@@ -36,10 +36,7 @@ public class Token {
 
     @ManyToOne
     @JoinColumn(name = "client_id")
-    private Client client;
-
-    @OneToOne(mappedBy = "token")
-    private Otp otp;
+    private AlisaClient alisaClient;
 
     @Column(name = "oauth_client")
     @Enumerated(value = EnumType.STRING)

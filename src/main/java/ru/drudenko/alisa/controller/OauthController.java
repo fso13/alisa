@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.drudenko.alisa.dto.oauth.YandexToken;
-import ru.drudenko.alisa.model.Client;
+import ru.drudenko.alisa.model.AlisaClient;
 import ru.drudenko.alisa.model.OauthClient;
 import ru.drudenko.alisa.model.Otp;
+import ru.drudenko.alisa.model.OtpType;
 import ru.drudenko.alisa.model.Token;
 import ru.drudenko.alisa.repository.ClientRepository;
 import ru.drudenko.alisa.repository.OtpRepository;
@@ -22,11 +23,11 @@ import ru.drudenko.alisa.repository.TokenRepository;
 import ru.drudenko.alisa.service.google.GmailCredentials;
 import ru.drudenko.alisa.service.google.GoogleTokenExtractor;
 import ru.drudenko.alisa.service.yandex.YandexTokenExtractor;
+import ru.drudenko.alisa.utils.RandomUtils;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.security.GeneralSecurityException;
-import java.util.Optional;
 
 @Transactional
 @RestController
@@ -56,15 +57,15 @@ public class OauthController {
         this.velocityEngine = velocityEngine;
     }
 
+    @Transactional
     @GetMapping(value = "/yandex", produces = {"text/html;charset=UTF-8"})
     ResponseEntity yandex(@RequestParam(name = "state") String state, @RequestParam(name = "code") String code) {
 
         YandexToken yandexToken = yandexTokenExtractor.getToken(code);
+        Otp otp = otpRepository.findByValueAndExpiredAndType(state.trim(), false, OtpType.ALISA_STATION).orElseThrow(RuntimeException::new);
+        AlisaClient alisaClient = clientRepository.findById(otp.getRef()).orElseThrow(RuntimeException::new);
 
-        Otp otp = otpRepository.findByValueAndExpiredAndTokenIsNull(state.trim(), false).orElseThrow(RuntimeException::new);
-        Client client = Optional.ofNullable(otp.getClient()).orElseThrow(RuntimeException::new);
-
-        Token token = client.getTokens()
+        Token token = alisaClient.getTokens()
                 .stream()
                 .filter(token1 -> token1.getOauthClient().equals(OauthClient.YANDEX))
                 .findFirst()
@@ -73,14 +74,14 @@ public class OauthController {
                     t.setAccessToken(yandexToken.getAccess_token());
                     t.setRefreshToken(yandexToken.getRefresh_token());
                     t.setOauthClient(OauthClient.YANDEX);
-                    t.setClient(client);
+                    t.setAlisaClient(alisaClient);
                     return tokenRepository.save(t);
                 });
 
+        String otpByClient = RandomUtils.getOtp();
         Otp newOtp = new Otp();
-        newOtp.setClient(client);
-        newOtp.setToken(token);
-        String otpByClient = String.valueOf(100000 + (long) (Math.random() * (999999 - 100000)));
+        newOtp.setRef(token.getId());
+        newOtp.setType(OtpType.TOKEN);
         newOtp.setValue(otpByClient);
         otpRepository.save(newOtp);
 
@@ -95,6 +96,7 @@ public class OauthController {
                 .body(writer.toString());
     }
 
+    @Transactional
     @GetMapping(value = "/google", produces = {"text/html;charset=UTF-8"})
     ResponseEntity google(@RequestParam(name = "state") String state, @RequestParam(name = "code") String code) throws GeneralSecurityException, IOException {
         GmailCredentials credentials = googleTokenExtractor.getToken(code);
