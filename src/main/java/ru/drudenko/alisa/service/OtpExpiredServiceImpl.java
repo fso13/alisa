@@ -20,7 +20,7 @@ public class OtpExpiredServiceImpl implements OtpExpiredService {
     @Scheduled(cron = "*/5 * * * * *")
     @SchedulerLock(name = "OtpExpiredServiceImpl.expired")
     public void expired() {
-        otpRepository.findByExpiredAndCreateTimeBeforeAndPersonIdIsNotNull(false, Instant.now().minusSeconds(60))
+        otpRepository.findByExpiredAndCreateTimeBeforeAndTokenIsNotNull(false, Instant.now().minusSeconds(60))
                 .forEach(otp -> {
                     otp.setExpired(true);
                     otpRepository.save(otp);

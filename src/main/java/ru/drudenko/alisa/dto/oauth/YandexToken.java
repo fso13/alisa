@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Token {
+public class YandexToken {
 
     private String token_type;
     private String access_token;

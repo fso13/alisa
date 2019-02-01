@@ -15,9 +15,9 @@ public interface OtpRepository extends JpaRepository<Otp, String> {
     @Transactional
     void deleteByClientId(String clientId);
 
-    Optional<Otp> findByValueAndExpiredAndPersonIdIsNotNull(String value, boolean expired);
+    Optional<Otp> findByValueAndExpiredAndTokenIsNotNull(String value, boolean expired);
 
-    Optional<Otp> findByValueAndExpiredAndPersonIdIsNull(String value, boolean expired);
+    Optional<Otp> findByValueAndExpiredAndTokenIsNull(String value, boolean expired);
 
-    List<Otp> findByExpiredAndCreateTimeBeforeAndPersonIdIsNotNull(boolean expired, Instant date);
+    List<Otp> findByExpiredAndCreateTimeBeforeAndTokenIsNotNull(boolean expired, Instant date);
 }

@@ -39,7 +39,7 @@ Authorization: OAuth AQAAAAACGRNXAAVyGsuzZcn5mkHXlcPMBfsICq4
 
 
 
- POST googleapis.com/oauth2/v4/token
+ POST googleapis.com/oauth2/v4/yandexToken
 
  Content-Type: application/x-www-form-urlencoded
 

@@ -1,5 +1,7 @@
 package ru.drudenko.alisa.service.yandex;
 
+import ru.drudenko.alisa.dto.oauth.YandexToken;
+
 public interface YandexTokenExtractor {
-    String getToken(String code);
+    YandexToken getToken(String code);
 }

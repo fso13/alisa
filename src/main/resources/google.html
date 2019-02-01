@@ -41,7 +41,7 @@
             border-radius: 6px;
             height: 170px;
             margin: 20px auto 0;
-            width: 298px;
+            width: 350px;
         }
 
         .login h1 {
@@ -70,7 +70,7 @@
             margin: 31px 0 0 29px;
             padding-left: 37px;
             transition: box-shadow 0.3s;
-            width: 240px;
+            width: 290px;
         }
 
         input[type="password"]:focus, input[type="text"]:focus {
@@ -96,7 +96,7 @@
         }
 
         input[type="submit"] {
-            width: 240px;
+            width: 290px;
             height: 35px;
             display: block;
             font-family: Arial, "Helvetica", sans-serif;
@@ -128,17 +128,20 @@
     </style>
 </head>
 <body>
-<form class="modal" action="https://oauth.yandex.ru/authorize" method="get">
+<form class="modal" action="https://accounts.google.com/o/oauth2/v2/auth" method="get">
     <div class="login">
         <div>
+            <input name="scope" value="https://mail.google.com/" hidden>
+            <input name="access_type" value="offline" hidden>
             <input name="response_type" value="code" hidden>
-            <input name="client_id" value="9ae83c35266d49b19ba3d791198e4829" hidden>
-            <input name="redirect_uri" value="https://ca5a278a.ngrok.io/oauth/yandex" hidden>
-            <input name="force_confirm" value="yes" hidden>
+            <input name="include_granted_scopes" value="true" hidden>
+            <input name="client_id" value="788764317534-erfn8p6im4v4vo5i2b28c6s4emqejlav.apps.googleusercontent.com"
+                   hidden>
+            <input name="redirect_uri" value="http://localhost:8181/oauth/google" hidden>
             <input type="text" placeholder="Код выданный Алисой" name="state" id="state">
         </div>
         <div>
-            <input type="submit" value="сделать привязку">
+            <input type="submit" value="Привязать Google аккаунт">
         </div>
     </div>
 </form>

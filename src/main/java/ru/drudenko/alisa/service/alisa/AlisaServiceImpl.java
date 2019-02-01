@@ -14,6 +14,7 @@ import ru.drudenko.alisa.dto.dialog.req.Command;
 import ru.drudenko.alisa.dto.dialog.req.Entity;
 import ru.drudenko.alisa.dto.passport.Passport;
 import ru.drudenko.alisa.model.Client;
+import ru.drudenko.alisa.model.OauthClient;
 import ru.drudenko.alisa.model.Otp;
 import ru.drudenko.alisa.repository.ClientRepository;
 import ru.drudenko.alisa.repository.OtpRepository;
@@ -71,7 +72,10 @@ public class AlisaServiceImpl implements AlisaService {
 
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "OAuth " + client.getPersonId());
+        headers.add("Authorization", "OAuth " + client.getTokens()
+                .stream()
+                .filter(token1 -> token1.getOauthClient().equals(OauthClient.YANDEX))
+                .findFirst().get().getAccessToken());
 
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
         ResponseEntity<Passport> responseEntity = restTemplate.
@@ -94,22 +98,22 @@ public class AlisaServiceImpl implements AlisaService {
         otpRepository.deleteByClientId(clientId);
 
         Otp otp = new Otp();
-        otp.setClientId(clientId);
+        otp.setClient(client);
         otp.setValue(otpByClient);
         otpRepository.save(otp);
 
-        return "Зайдите на сайт бота, войдите под учетной записью Яндекс, и введите код. " + otpByClient;
+        return "Зайдите на сайт бота, войдите под учетной записью Яндекс, и введите код - " + otpByClient;
     }
 
     private String step3(String clientId, String otp) {
         Client client = clientRepository.findByClientId(clientId).orElseThrow(RuntimeException::new);
 
-        Optional<Otp> byValueAndIsActive = otpRepository.findByValueAndExpiredAndPersonIdIsNotNull(otp, false);
+        Optional<Otp> byValueAndIsActive = otpRepository.findByValueAndExpiredAndTokenIsNotNull(otp, false);
         if (!byValueAndIsActive.isPresent()) {
             return "Не верный код подтверждения. Или он был выслан больше минуты назад.";
         }
         client.setActive(true);
-        client.setPersonId(byValueAndIsActive.get().getPersonId());
+        client.getTokens().add(byValueAndIsActive.get().getToken());
         clientRepository.save(client);
         byValueAndIsActive.get().setExpired(true);
         otpRepository.save(byValueAndIsActive.get());
