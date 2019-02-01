@@ -16,7 +16,7 @@ import ru.drudenko.alisa.model.OauthClient;
 import ru.drudenko.alisa.model.Otp;
 import ru.drudenko.alisa.model.OtpType;
 import ru.drudenko.alisa.model.Token;
-import ru.drudenko.alisa.repository.ClientRepository;
+import ru.drudenko.alisa.repository.AlisaClientRepository;
 import ru.drudenko.alisa.repository.OtpRepository;
 import ru.drudenko.alisa.repository.TokenRepository;
 import ru.drudenko.alisa.service.spi.OauthClientService;
@@ -33,29 +33,29 @@ public class OauthController {
 
     private final List<OauthClientService> oauthClientServices;
     private final OtpRepository otpRepository;
-    private final ClientRepository clientRepository;
+    private final AlisaClientRepository alisaClientRepository;
     private final TokenRepository tokenRepository;
     private final VelocityEngine velocityEngine;
 
     @Autowired
     public OauthController(List<OauthClientService> oauthClientServices,
                            OtpRepository otpRepository,
-                           ClientRepository clientRepository,
+                           AlisaClientRepository alisaClientRepository,
                            TokenRepository tokenRepository,
                            VelocityEngine velocityEngine) {
         this.oauthClientServices = oauthClientServices;
         this.otpRepository = otpRepository;
-        this.clientRepository = clientRepository;
+        this.alisaClientRepository = alisaClientRepository;
         this.tokenRepository = tokenRepository;
         this.velocityEngine = velocityEngine;
     }
 
     @Transactional
     @GetMapping(produces = {"text/html;charset=UTF-8"})
-    ResponseEntity oauth(@RequestParam(name = "client_id") String oauthClient,
+    ResponseEntity oauth(@RequestParam(name = "agent_id") String agentId,
                          @RequestParam(name = "state") String state,
                          @RequestParam(name = "code") String code) throws Exception {
-        OauthClient client = OauthClient.builder().name(oauthClient).build();
+        OauthClient client = OauthClient.builder().name(agentId).build();
 
         TokenDto tokenDto = oauthClientServices.stream()
                 .filter(oauthClientService -> oauthClientService.getOauthClient().equals(client))
@@ -63,7 +63,7 @@ public class OauthController {
                 .get()
                 .getToken(code);
         Otp otp = otpRepository.findByValueAndExpiredAndType(state.trim(), false, OtpType.ALISA_STATION).orElseThrow(RuntimeException::new);
-        AlisaClient alisaClient = clientRepository.findById(otp.getRef()).orElseThrow(RuntimeException::new);
+        AlisaClient alisaClient = alisaClientRepository.findById(otp.getRef()).orElseThrow(RuntimeException::new);
 
         Token token = alisaClient.getTokens()
                 .stream()

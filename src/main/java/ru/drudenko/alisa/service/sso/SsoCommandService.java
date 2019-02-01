@@ -1,9 +1,10 @@
 package ru.drudenko.alisa.service.sso;
 
 import org.springframework.transaction.annotation.Transactional;
+import ru.drudenko.alisa.service.alisa.CommandService;
 
 @Transactional
-public interface SsoService {
+public interface SsoCommandService extends CommandService {
 
     String step1(String clientId);
 

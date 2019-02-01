@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import ru.drudenko.alisa.model.AlisaClient;
 
 @Repository
-public interface ClientRepository extends JpaRepository<AlisaClient, String> {
+public interface AlisaClientRepository extends JpaRepository<AlisaClient, String> {
 }
 

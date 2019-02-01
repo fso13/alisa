@@ -4,17 +4,15 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script>
-        function yandexShow()
-        {
-            document.getElementById('yandexButton').setAttribute("hidden","true");
-            document.getElementById('googleButton').setAttribute("hidden","true");
+        function yandexShow() {
+            document.getElementById('yandexButton').setAttribute("hidden", "true");
+            document.getElementById('googleButton').setAttribute("hidden", "true");
             document.getElementById('yandexForm').removeAttribute("hidden");
         }
 
-        function googleShow()
-        {
-            document.getElementById('yandexButton').setAttribute("hidden","true");
-            document.getElementById('googleButton').setAttribute("hidden","true");
+        function googleShow() {
+            document.getElementById('yandexButton').setAttribute("hidden", "true");
+            document.getElementById('googleButton').setAttribute("hidden", "true");
             document.getElementById('googleForm').removeAttribute("hidden");
         }
     </script>
@@ -152,7 +150,7 @@
         <div>
             <input name="response_type" value="code" hidden>
             <input name="client_id" value="9ae83c35266d49b19ba3d791198e4829" hidden>
-            <input name="redirect_uri" value="https://184d7f62.ngrok.io/oauth?client_id=yandex" hidden>
+            <input name="redirect_uri" value="https://184d7f62.ngrok.io/oauth/yandex" hidden>
             <input name="force_confirm" value="yes" hidden>
             <input type="text" placeholder="Код выданный Алисой" name="state" id="state">
         </div>
