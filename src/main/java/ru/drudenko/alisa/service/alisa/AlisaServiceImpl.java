@@ -15,7 +15,6 @@ import ru.drudenko.alisa.dto.dialog.req.Command;
 import ru.drudenko.alisa.dto.dialog.req.Entity;
 import ru.drudenko.alisa.dto.passport.Passport;
 import ru.drudenko.alisa.model.AlisaClient;
-import ru.drudenko.alisa.model.OauthClient;
 import ru.drudenko.alisa.repository.ClientRepository;
 import ru.drudenko.alisa.service.sso.SsoService;
 
@@ -71,7 +70,7 @@ public class AlisaServiceImpl implements AlisaService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "OAuth " + alisaClient.getTokens()
                 .stream()
-                .filter(token1 -> token1.getOauthClient().equals(OauthClient.YANDEX))
+                .filter(token1 -> token1.getOauthClient().equals("yandex"))
                 .findFirst().get().getAccessToken());
 
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);

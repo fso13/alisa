@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.drudenko.alisa.dto.oauth.YandexToken;
 import ru.drudenko.alisa.model.AlisaClient;
 import ru.drudenko.alisa.model.OauthClient;
 import ru.drudenko.alisa.model.Otp;
@@ -20,37 +19,31 @@ import ru.drudenko.alisa.model.Token;
 import ru.drudenko.alisa.repository.ClientRepository;
 import ru.drudenko.alisa.repository.OtpRepository;
 import ru.drudenko.alisa.repository.TokenRepository;
-import ru.drudenko.alisa.service.google.GmailCredentials;
-import ru.drudenko.alisa.service.google.GoogleTokenExtractor;
-import ru.drudenko.alisa.service.yandex.YandexTokenExtractor;
+import ru.drudenko.alisa.service.spi.OauthClientService;
+import ru.drudenko.alisa.service.spi.TokenDto;
 import ru.drudenko.alisa.utils.RandomUtils;
 
-import java.io.IOException;
 import java.io.StringWriter;
-import java.security.GeneralSecurityException;
+import java.util.List;
 
 @Transactional
 @RestController
 @RequestMapping(value = "/oauth", produces = MediaType.ALL_VALUE)
 public class OauthController {
 
-
-    private final YandexTokenExtractor yandexTokenExtractor;
-    private final GoogleTokenExtractor googleTokenExtractor;
+    private final List<OauthClientService> oauthClientServices;
     private final OtpRepository otpRepository;
     private final ClientRepository clientRepository;
     private final TokenRepository tokenRepository;
     private final VelocityEngine velocityEngine;
 
     @Autowired
-    public OauthController(YandexTokenExtractor yandexTokenExtractor,
-                           GoogleTokenExtractor googleTokenExtractor,
+    public OauthController(List<OauthClientService> oauthClientServices,
                            OtpRepository otpRepository,
                            ClientRepository clientRepository,
                            TokenRepository tokenRepository,
                            VelocityEngine velocityEngine) {
-        this.yandexTokenExtractor = yandexTokenExtractor;
-        this.googleTokenExtractor = googleTokenExtractor;
+        this.oauthClientServices = oauthClientServices;
         this.otpRepository = otpRepository;
         this.clientRepository = clientRepository;
         this.tokenRepository = tokenRepository;
@@ -58,22 +51,29 @@ public class OauthController {
     }
 
     @Transactional
-    @GetMapping(value = "/yandex", produces = {"text/html;charset=UTF-8"})
-    ResponseEntity yandex(@RequestParam(name = "state") String state, @RequestParam(name = "code") String code) {
+    @GetMapping(produces = {"text/html;charset=UTF-8"})
+    ResponseEntity oauth(@RequestParam(name = "client_id") String oauthClient,
+                         @RequestParam(name = "state") String state,
+                         @RequestParam(name = "code") String code) throws Exception {
+        OauthClient client = OauthClient.builder().name(oauthClient).build();
 
-        YandexToken yandexToken = yandexTokenExtractor.getToken(code);
+        TokenDto tokenDto = oauthClientServices.stream()
+                .filter(oauthClientService -> oauthClientService.getOauthClient().equals(client))
+                .findFirst()
+                .get()
+                .getToken(code);
         Otp otp = otpRepository.findByValueAndExpiredAndType(state.trim(), false, OtpType.ALISA_STATION).orElseThrow(RuntimeException::new);
         AlisaClient alisaClient = clientRepository.findById(otp.getRef()).orElseThrow(RuntimeException::new);
 
         Token token = alisaClient.getTokens()
                 .stream()
-                .filter(token1 -> token1.getOauthClient().equals(OauthClient.YANDEX))
+                .filter(token1 -> token1.getOauthClient().equals(client.getName()))
                 .findFirst()
                 .orElseGet(() -> {
                     Token t = new Token();
-                    t.setAccessToken(yandexToken.getAccess_token());
-                    t.setRefreshToken(yandexToken.getRefresh_token());
-                    t.setOauthClient(OauthClient.YANDEX);
+                    t.setAccessToken(tokenDto.getAccessToken());
+                    t.setRefreshToken(tokenDto.getRefreshToken());
+                    t.setOauthClient(client.getName());
                     t.setAlisaClient(alisaClient);
                     return tokenRepository.save(t);
                 });
@@ -94,14 +94,5 @@ public class OauthController {
         return ResponseEntity
                 .ok()
                 .body(writer.toString());
-    }
-
-    @Transactional
-    @GetMapping(value = "/google", produces = {"text/html;charset=UTF-8"})
-    ResponseEntity google(@RequestParam(name = "state") String state, @RequestParam(name = "code") String code) throws GeneralSecurityException, IOException {
-        GmailCredentials credentials = googleTokenExtractor.getToken(code);
-        System.out.println(code);
-        return ResponseEntity
-                .ok().build();
     }
 }

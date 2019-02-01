@@ -1,4 +1,4 @@
-package ru.drudenko.alisa.service.yandex;
+package ru.drudenko.alisa.service.spi.google;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -6,16 +6,16 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import ru.drudenko.alisa.dto.oauth.YandexToken;
+import ru.drudenko.alisa.model.OauthClient;
+import ru.drudenko.alisa.service.spi.OauthClientService;
 
 @Service
-public class YandexTokenExtractorImpl implements YandexTokenExtractor {
+public class GoogleTokenExtractorImpl implements OauthClientService {
     private final RestTemplate restTemplate = restTemplate();
 
     private static RestTemplate restTemplate() {
@@ -24,32 +24,39 @@ public class YandexTokenExtractorImpl implements YandexTokenExtractor {
         httpRequestFactory.setConnectionRequestTimeout(10000);
         return new RestTemplate(httpRequestFactory);
     }
-    
-    @Value("${app.yandex.client_id}")
+
+    @Value("${app.google.client_id}")
     private String clientId;
 
-    @Value("${app.yandex.client_secret}")
+    @Value("${app.google.client_secret}")
     private String clientSecret;
 
-    @Override
-    public YandexToken getToken(final String code) {
+    @Value("${app.google.redirect_url}")
+    private String redirectUrl;
 
+    @Override
+    public GmailCredentialsDto getToken(final String code) {
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("grant_type", "authorization_code");
-        map.add("code", Long.valueOf(code));
-        map.add("client_id", clientId);
+        map.add("redirect_uri", redirectUrl);
         map.add("client_secret", clientSecret);
+        map.add("client_id", clientId);
+        map.add("code", code);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
-        ResponseEntity<YandexToken> responseEntity = restTemplate.
-                exchange("https://oauth.yandex.ru/token",
+
+        return (GmailCredentialsDto) restTemplate.
+                exchange("https://www.googleapis.com/oauth2/v4/token",
                         HttpMethod.POST,
                         request,
-                        ParameterizedTypeReference.forType(YandexToken.class));
+                        ParameterizedTypeReference.forType(GmailCredentialsDto.class)).getBody();
 
-        return responseEntity.getBody();
+    }
+
+    @Override
+    public OauthClient getOauthClient() {
+        return OauthClient.builder().name("google").build();
     }
 }

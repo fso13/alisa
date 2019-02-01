@@ -6,13 +6,10 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -28,10 +25,10 @@ public class Token {
     @GeneratedValue(generator = "uuid")
     private String id;
 
-    @Column(name = "access_token")
+    @Column(name = "accessToken")
     private String accessToken;
 
-    @Column(name = "refresh_token")
+    @Column(name = "refreshToken")
     private String refreshToken;
 
     @ManyToOne
@@ -39,8 +36,7 @@ public class Token {
     private AlisaClient alisaClient;
 
     @Column(name = "oauth_client")
-    @Enumerated(value = EnumType.STRING)
-    private OauthClient oauthClient;
+    private String oauthClient;
 
     @Column(name = "time_create")
     private Instant createTime;

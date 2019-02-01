@@ -1,5 +1,12 @@
 package ru.drudenko.alisa.model;
 
-public enum OauthClient {
-    YANDEX,GOOGLE
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
+@Builder
+@Getter
+@EqualsAndHashCode
+public class OauthClient {
+    private String name;
 }
