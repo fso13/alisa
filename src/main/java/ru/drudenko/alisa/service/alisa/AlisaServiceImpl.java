@@ -1,0 +1,23 @@
+package ru.drudenko.alisa.service.alisa;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ru.drudenko.alisa.dto.dialog.req.Command;
+
+import java.util.List;
+
+@Service
+public class AlisaServiceImpl implements AlisaService {
+
+    private final List<CommandService> commandServices;
+
+    @Autowired
+    public AlisaServiceImpl(final List<CommandService> commandServices) {
+        this.commandServices = commandServices;
+    }
+
+    @Override
+    public String getText(Command command) {
+        return commandServices.stream().filter(service -> service.doFilter(command)).findFirst().get().getMessage(command);
+    }
+}
