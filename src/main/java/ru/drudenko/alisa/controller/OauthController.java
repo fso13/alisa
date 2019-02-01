@@ -72,13 +72,14 @@ public class OauthController {
                 .findFirst()
                 .orElseGet(() -> {
                     Token t = new Token();
-                    t.setAccessToken(tokenDto.getAccessToken());
-                    t.setRefreshToken(tokenDto.getRefreshToken());
                     t.setOauthClient(client.getName());
                     t.setAlisaClient(alisaClient);
-                    return tokenRepository.save(t);
+                    return t;
                 });
 
+        token.setAccessToken(tokenDto.getAccessToken());
+        token.setRefreshToken(tokenDto.getRefreshToken());
+        token =  tokenRepository.save(token);
         String otpByClient = RandomUtils.getOtp();
         Otp newOtp = new Otp();
         newOtp.setRef(token.getId());
