@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 @Service
 public class SsoCommandServiceImpl implements SsoCommandService {
     private static final List<String> TOKENS_STEP1 = Arrays.asList("привяжи", "устройство");
-    private static final List<String> TOKENS_STEP3_1 = Arrays.asList("привяжи", "учетку");
-    private static final List<String> TOKENS_STEP3_2 = Arrays.asList("привяжи", "учётку");
+    private static final List<String> TOKENS_STEP3_1 = Arrays.asList("активируй", "учетку");
+    private static final List<String> TOKENS_STEP3_2 = Arrays.asList("активируй", "учётку");
 
     private final AlisaClientRepository alisaClientRepository;
     private final OtpRepository otpRepository;
