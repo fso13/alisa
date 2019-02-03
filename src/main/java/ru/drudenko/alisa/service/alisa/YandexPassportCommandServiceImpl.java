@@ -67,4 +67,9 @@ public class YandexPassportCommandServiceImpl implements CommandService {
 
         return responseEntity.getBody().getRealName();
     }
+
+    @Override
+    public String getCommands() {
+        return "как меня зовут \n скажи мое имя";
+    }
 }

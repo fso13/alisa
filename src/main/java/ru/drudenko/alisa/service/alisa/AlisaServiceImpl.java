@@ -28,6 +28,11 @@ public class AlisaServiceImpl implements AlisaService {
             public String getMessage(final Command command) {
                 return "Что то не понятное.";
             }
+
+            @Override
+            public String getCommands() {
+                return null;
+            }
         }).getMessage(command);
     }
 }
