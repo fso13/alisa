@@ -1,92 +1,100 @@
 package ru.drudenko.alisa.controller;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import ru.drudenko.alisa.dto.oauth.Token;
-import ru.drudenko.alisa.model.Client;
+import ru.drudenko.alisa.model.AlisaClient;
+import ru.drudenko.alisa.model.OauthClient;
 import ru.drudenko.alisa.model.Otp;
-import ru.drudenko.alisa.repository.ClientRepository;
+import ru.drudenko.alisa.model.OtpType;
+import ru.drudenko.alisa.model.Token;
+import ru.drudenko.alisa.repository.AlisaClientRepository;
 import ru.drudenko.alisa.repository.OtpRepository;
+import ru.drudenko.alisa.repository.TokenRepository;
+import ru.drudenko.alisa.service.spi.OauthClientService;
+import ru.drudenko.alisa.service.spi.TokenDto;
+import ru.drudenko.alisa.utils.RandomUtils;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.StringWriter;
+import java.util.List;
 
+@Transactional
 @RestController
 @RequestMapping(value = "/oauth", produces = MediaType.ALL_VALUE)
 public class OauthController {
 
-    @Value("${app.client_id}")
-    private String client_id;
-
-    @Value("${app.client_secret}")
-    private String client_secret;
-
-    private final RestTemplate yandexRestTemplate;
+    private final List<OauthClientService> oauthClientServices;
     private final OtpRepository otpRepository;
-    private final ClientRepository clientRepository;
+    private final AlisaClientRepository alisaClientRepository;
+    private final TokenRepository tokenRepository;
+    private final VelocityEngine velocityEngine;
 
     @Autowired
-    public OauthController(RestTemplate yandexRestTemplate,
+    public OauthController(List<OauthClientService> oauthClientServices,
                            OtpRepository otpRepository,
-                           ClientRepository clientRepository) {
-
-        this.yandexRestTemplate = yandexRestTemplate;
+                           AlisaClientRepository alisaClientRepository,
+                           TokenRepository tokenRepository,
+                           VelocityEngine velocityEngine) {
+        this.oauthClientServices = oauthClientServices;
         this.otpRepository = otpRepository;
-        this.clientRepository = clientRepository;
+        this.alisaClientRepository = alisaClientRepository;
+        this.tokenRepository = tokenRepository;
+        this.velocityEngine = velocityEngine;
     }
 
-    @GetMapping(value = "/yandex")
-    void yandex(HttpServletResponse response, @RequestParam(name = "state") String state, @RequestParam(name = "code") String code) throws IOException {
+    @Transactional
+    @GetMapping(value = "/{agentId}", produces = {"text/html;charset=UTF-8"})
+    ResponseEntity oauth(@PathVariable("agentId") String agentId,
+                         @RequestParam(name = "state") String state,
+                         @RequestParam(name = "code") String code) throws Exception {
+        OauthClient client = OauthClient.builder().name(agentId).build();
 
-        String token = getToken(code);
+        TokenDto tokenDto = oauthClientServices.stream()
+                .filter(oauthClientService -> oauthClientService.getOauthClient().equals(client))
+                .findFirst()
+                .get()
+                .getToken(code);
+        Otp otp = otpRepository.findByValueAndExpiredAndType(state.trim(), false, OtpType.ALISA_STATION).orElseThrow(RuntimeException::new);
+        AlisaClient alisaClient = alisaClientRepository.findById(otp.getRef()).orElseThrow(RuntimeException::new);
 
-        Otp otp = otpRepository.findByValueAndExpiredAndPersonIdIsNull(state.trim(), false).orElseThrow(RuntimeException::new);
-        Client client = clientRepository.findByClientId(otp.getClientId()).orElseThrow(RuntimeException::new);
-        client.setPersonId(token);
+        Token token = alisaClient.getTokens()
+                .stream()
+                .filter(token1 -> token1.getOauthClient().equals(client.getName()))
+                .findFirst()
+                .orElseGet(() -> {
+                    Token t = new Token();
+                    t.setOauthClient(client.getName());
+                    t.setAlisaClient(alisaClient);
+                    return t;
+                });
 
+        token.setAccessToken(tokenDto.getAccessToken());
+        token.setRefreshToken(tokenDto.getRefreshToken());
+        token =  tokenRepository.save(token);
+        String otpByClient = RandomUtils.getOtp();
         Otp newOtp = new Otp();
-        newOtp.setClientId(otp.getClientId());
-        newOtp.setPersonId(token);
-        String otpByClient = String.valueOf(100000 + (long) (Math.random() * (999999 - 100000)));
+        newOtp.setRef(token.getId());
+        newOtp.setType(OtpType.TOKEN);
         newOtp.setValue(otpByClient);
         otpRepository.save(newOtp);
-        response.setContentType("text/plain; charset=utf-8");
-        response.getWriter().println("Скажите Алисе код :" + otpByClient + ", в течении минуты.");
+
+        Template t = velocityEngine.getTemplate("src/main/resources/templates/code.html", "utf-8");
+        VelocityContext context = new VelocityContext();
+        context.put("otpByClient", otpByClient);
+        StringWriter writer = new StringWriter();
+        t.merge(context, writer);
+
+        return ResponseEntity
+                .ok()
+                .body(writer.toString());
     }
-
-    private String getToken(String code) {
-
-        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add("grant_type", "authorization_code");
-        map.add("code", Long.valueOf(code));
-        map.add("client_id", client_id);
-        map.add("client_secret", client_secret);
-
-        HttpHeaders headers = new HttpHeaders();
-//        headers.setBasicAuth(client_id, client_secret);
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
-        ResponseEntity<Token> responseEntity = yandexRestTemplate.
-                exchange("https://oauth.yandex.ru/token",
-                        HttpMethod.POST,
-                        request,
-                        ParameterizedTypeReference.forType(Token.class));
-
-        return responseEntity.getBody().getAccess_token();
-    }
-
 }

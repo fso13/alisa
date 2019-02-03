@@ -6,38 +6,37 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.time.Instant;
 
-
 @Getter
 @Setter
 @Entity
-@Table(name = "tb_otp")
-public class Otp {
-
+@Table(name = "tb_token")
+public class Token {
     @Id
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     @GeneratedValue(generator = "uuid")
     private String id;
 
-    @Column(name = "type")
-    @Enumerated(value = EnumType.STRING)
-    private OtpType type;
+    @Column(name = "accessToken")
+    private String accessToken;
 
-    @Column(name = "ref")
-    private String ref;
+    @Column(name = "refreshToken")
+    private String refreshToken;
 
-    @Column(name = "value")
-    private String value;
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private AlisaClient alisaClient;
 
-    private Boolean expired = false;
+    @Column(name = "oauth_client")
+    private String oauthClient;
 
     @Column(name = "time_create")
     private Instant createTime;

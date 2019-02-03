@@ -3,6 +3,7 @@ package ru.drudenko.alisa.service;
 import net.javacrumbs.shedlock.core.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import ru.drudenko.alisa.model.OtpType;
 import ru.drudenko.alisa.repository.OtpRepository;
 
 import java.time.Instant;
@@ -20,7 +21,7 @@ public class OtpExpiredServiceImpl implements OtpExpiredService {
     @Scheduled(cron = "*/5 * * * * *")
     @SchedulerLock(name = "OtpExpiredServiceImpl.expired")
     public void expired() {
-        otpRepository.findByExpiredAndCreateTimeBeforeAndPersonIdIsNotNull(false, Instant.now().minusSeconds(60))
+        otpRepository.findByExpiredAndCreateTimeBeforeAndType(false, Instant.now().minusSeconds(60), OtpType.TOKEN)
                 .forEach(otp -> {
                     otp.setExpired(true);
                     otpRepository.save(otp);
