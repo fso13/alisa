@@ -99,4 +99,9 @@ public class SsoCommandServiceImpl implements SsoCommandService {
 
         return null;
     }
+
+    @Override
+    public String getCommands() {
+        return "привяжи устройство \n активируй учетку";
+    }
 }

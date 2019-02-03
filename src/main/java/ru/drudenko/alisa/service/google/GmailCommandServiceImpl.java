@@ -61,6 +61,11 @@ public final class GmailCommandServiceImpl implements GmailCommandService {
     }
 
     @Override
+    public String getCommands() {
+        return "получи почту";
+    }
+
+    @Override
     public String getMessage(final Command command) {
         try {
             AlisaClient client = alisaClientRepository.getOne(command.getSession().getUserId());

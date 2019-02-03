@@ -6,4 +6,6 @@ public interface CommandService {
     boolean doFilter(Command command);
 
     String getMessage(Command command);
+
+    String getCommands();
 }
