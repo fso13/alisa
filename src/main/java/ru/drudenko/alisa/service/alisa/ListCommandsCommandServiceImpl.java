@@ -11,7 +11,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ListCommandsCommandServiceImpl implements CommandService {
-    private static final List<String> LIST_COMMANDS = Arrays.asList("список", "команд");
+    private static final List<String> LIST_COMMANDS_1 = Arrays.asList("список", "команд");
+    private static final List<String> LIST_COMMANDS_2 = Arrays.asList("Список", "команд");
 
     @Autowired
     private final List<CommandService> commandServices;
@@ -24,7 +25,7 @@ public class ListCommandsCommandServiceImpl implements CommandService {
     @Override
     public boolean doFilter(final Command command) {
         List<String> tokens = command.getRequest().getNlu().getTokens();
-        return tokens.containsAll(LIST_COMMANDS);
+        return tokens.containsAll(LIST_COMMANDS_1) || tokens.containsAll(LIST_COMMANDS_2);
     }
 
     @Override
