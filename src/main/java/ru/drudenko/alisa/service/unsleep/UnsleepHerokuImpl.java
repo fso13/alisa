@@ -11,8 +11,8 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class UnsleepHerokuImpl implements UnsleepHeroku {
-   static HttpEntity httpEntity;
-    public static final String STRING = "{\n" +
+    private static HttpEntity httpEntity;
+    private static final String STRING = "{\n" +
             "  \"meta\": {\n" +
             "    \"client_id\": \"string\",\n" +
             "    \"locale\": \"string\",\n" +
@@ -54,14 +54,14 @@ public class UnsleepHerokuImpl implements UnsleepHeroku {
     static {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        httpEntity = new HttpEntity(STRING, headers);
+        httpEntity = new HttpEntity<>(STRING, headers);
     }
     private final RestTemplate restTemplate = restTemplate();
 
-    @Scheduled(cron = "0 */5 * * * *")
     @Override
+    @Scheduled(cron = "*/5 * * * * *")
     public void start() {
-        System.out.println(restTemplate.exchange("https://alisa-java.herokuapp.com/alisa/command", HttpMethod.POST, httpEntity, Object.class).getStatusCode());
+        System.out.println(restTemplate.exchange("http://alisa-java.herokuapp.com/alisa/command", HttpMethod.POST, httpEntity, Object.class).getStatusCode());
     }
 
     private static RestTemplate restTemplate() {
