@@ -1,5 +1,9 @@
 package ru.drudenko.alisa.service.unsleep;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -7,13 +11,57 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class UnsleepHerokuImpl implements UnsleepHeroku {
+   static HttpEntity httpEntity;
+    public static final String STRING = "{\n" +
+            "  \"meta\": {\n" +
+            "    \"client_id\": \"string\",\n" +
+            "    \"locale\": \"string\",\n" +
+            "    \"timezone\": \"string\"\n" +
+            "  },\n" +
+            "  \"request\": {\n" +
+            "    \"command\": \"string\",\n" +
+            "    \"markup\": {\n" +
+            "      \"dangerous_context\": true\n" +
+            "    },\n" +
+            "    \"nlu\": {\n" +
+            "      \"entities\": [\n" +
+            "        {\n" +
+            "          \"tokens\": {\n" +
+            "            \"end\": 0,\n" +
+            "            \"start\": 0\n" +
+            "          },\n" +
+            "          \"type\": \"string\",\n" +
+            "          \"value\": {}\n" +
+            "        }\n" +
+            "      ],\n" +
+            "      \"tokens\": [\n" +
+            "        \"string\"\n" +
+            "      ]\n" +
+            "    },\n" +
+            "    \"original_utterance\": \"string\",\n" +
+            "    \"type\": \"string\"\n" +
+            "  },\n" +
+            "  \"session\": {\n" +
+            "    \"message_id\": 0,\n" +
+            "    \"new\": true,\n" +
+            "    \"session_id\": \"string\",\n" +
+            "    \"skill_id\": \"string\",\n" +
+            "    \"user_id\": \"string\"\n" +
+            "  },\n" +
+            "  \"version\": \"string\"\n" +
+            "}";
 
+    static {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        httpEntity = new HttpEntity(STRING, headers);
+    }
     private final RestTemplate restTemplate = restTemplate();
 
     @Scheduled(cron = "0 */5 * * * *")
     @Override
     public void start() {
-        restTemplate.getForObject("https://alisa-java.herokuapp.com/", Object.class);
+        System.out.println(restTemplate.exchange("https://alisa-java.herokuapp.com/alisa/command", HttpMethod.POST, httpEntity, Object.class).getStatusCode());
     }
 
     private static RestTemplate restTemplate() {
