@@ -1,5 +1,6 @@
 package ru.drudenko.alisa.service.unsleep;
 
+import net.javacrumbs.shedlock.core.SchedulerLock;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -59,7 +60,8 @@ public class UnsleepHerokuImpl implements UnsleepHeroku {
     private final RestTemplate restTemplate = restTemplate();
 
     @Override
-    @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(fixedRate=60000)
+    @SchedulerLock(name = "UnsleepHerokuImpl.start")
     public void start() {
         System.out.println(restTemplate.exchange("http://alisa-java.herokuapp.com/alisa/command", HttpMethod.POST, httpEntity, Object.class).getStatusCode());
     }
