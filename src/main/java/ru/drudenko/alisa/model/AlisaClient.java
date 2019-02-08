@@ -2,35 +2,33 @@ package ru.drudenko.alisa.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "tb_client")
-public class Client {
+@Table(name = "tb_alisa_client")
+public class AlisaClient {
     @Id
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @GeneratedValue(generator = "uuid")
+    @Column(name = "id")
     private String id;
-
-    @Column(name = "client_id")
-    private String clientId;
-
-    @Column(name = "person_id")
-    private String personId;
 
     @Column(name = "is_active")
     private boolean isActive = false;
+
+    @OneToMany(mappedBy = "alisaClient", fetch = FetchType.EAGER)
+    private Set<Token> tokens = new HashSet<>();
 
     @Column(name = "time_create")
     private Instant createTime;

@@ -1,0 +1,46 @@
+login.yandex.ru/info?format=json&with_openid_identity=true
+
+Authorization: OAuth AQAAAAACGRNXAAVyGsuzZcn5mkHXlcPMBfsICq4
+
+
+{
+ "first_name": "дима",
+ "last_name": "руденко",
+ "display_name": "dimarudenk",
+ "emails":[
+ "dimarudenk@yandex.ru"
+ ],
+ "default_email": "dimarudenk@yandex.ru",
+ "real_name": "дима руденко",
+ "birthday": "1989-06-20",
+ "openid_identities":[
+ "http://openid.yandex.ru/dimarudenk/",
+ "http://dimarudenk.ya.ru/"
+ ],
+ "login": "dimarudenk",
+ "sex": "male",
+ "id": "35197783"
+ }
+
+
+
+
+ https://accounts.google.com/o/oauth2/v2/auth?
+  scope=https://mail.google.com/&
+  access_type=offline&
+  include_granted_scopes=true&
+  state=123456&
+  redirect_uri=http://localhost:8181/oauth?agent_id=google&
+  response_type=code&
+  client_id=788764317534-erfn8p6im4v4vo5i2b28c6s4emqejlav.apps.googleusercontent.com
+
+
+
+
+
+
+ POST googleapis.com/oauth2/v4/yandexToken
+
+ Content-Type: application/x-www-form-urlencoded
+
+ grant_type=authorization_code&code=4/5ACn_Us7-IHhtZcufU5lL-71nl_YSzjzVsQdmu-bQUZWRCTMMySLCzyrX86IrqRZcAW8Cdxftgra0S5rH_gLXjA&client_id=788764317534-erfn8p6im4v4vo5i2b28c6s4emqejlav.apps.googleusercontent.com&client_secret=gykHUJOipdk1a5p-8A-1RYxy&redirect_uri=http://localhost:8181/oauth?agent_id%3Dgoogle

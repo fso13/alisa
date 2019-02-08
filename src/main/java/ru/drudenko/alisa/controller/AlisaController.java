@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.drudenko.alisa.dto.dialog.req.Command;
 import ru.drudenko.alisa.dto.dialog.res.Render;
-import ru.drudenko.alisa.service.AlisaService;
+import ru.drudenko.alisa.service.alisa.AlisaService;
 
 @RestController
 @RequestMapping(value = "/alisa/command", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -22,7 +22,7 @@ public class AlisaController {
     }
 
     @PostMapping
-    Render command(@RequestBody Command command) {
+    public Render command(@RequestBody Command command) {
         System.out.println(command);
 
         String text = alisaService.getText(command);
