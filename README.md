@@ -16,9 +16,9 @@ feature:install http http-white board cxf-jaxrs cxf-http-client spring spring-tx
 
 добавляем фичи наших бандлов и устанавливаем
 ```
-feature:repo-add mvn:ru.drudenko/alisa-core/2.0.x/xml/features
-feature:repo-add mvn:ru.drudenko/alisa-yandex-gateway/2.0.x/xml/features
-feature:repo-add mvn:ru.drudenko/alisa-google-gateway/2.0.x/xml/features
+feature:repo-add mvn:ru.drudenko/alisa-core/LATEST/xml/features
+feature:repo-add mvn:ru.drudenko/alisa-yandex-gateway/LATEST/xml/features
+feature:repo-add mvn:ru.drudenko/alisa-google-gateway/LATEST/xml/features
 feature:install alisa-core alisa-yandex-gateway alisa-google-gateway
 ```
 
