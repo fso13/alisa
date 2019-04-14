@@ -5,7 +5,7 @@
     <groupId>ru.drudenko</groupId>
     <artifactId>alisa-yandex-gateway</artifactId>
     <version>2.0.0</version>
-    <packaging>pom</packaging>
+    <packaging>bundle</packaging>
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
@@ -152,6 +152,11 @@
                             ru.drudenko.alisa.api.*,
                             ru.drudenko.alisa.spi.*,
                             org.springframework.http,
+                            org.springframework.beans,
+                            org.springframework.beans.factory,
+                            org.springframework.cglib.core,
+                            org.springframework.cglib.proxy,
+                            org.springframework.cglib.reflect,
                             *
                         </Import-Package>
                     </instructions>
