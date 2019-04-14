@@ -24,7 +24,7 @@ import java.util.List;
 })
 @Getter
 @Setter
-class Passport {
+public class Passport {
 
     @JsonProperty("first_name")
     private String firstName;

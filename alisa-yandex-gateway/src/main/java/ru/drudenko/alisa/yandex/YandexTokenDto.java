@@ -13,6 +13,7 @@ import ru.drudenko.alisa.api.auth.TokenDto;
 @JsonIgnoreProperties
 @NoArgsConstructor
 @AllArgsConstructor
+public
 class YandexTokenDto extends TokenDto {
 
     @JsonProperty(value = "token_type")

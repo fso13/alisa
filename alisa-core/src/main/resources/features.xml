@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features name="${project.groupId}" xmlns="http://karaf.apache.org/xmlns/features/v1.3.0">
+    <repository>mvn:ru.drudenko/alisa-features/2.0.2/xml/features</repository>
+
+    <feature name='${project.artifactId}' version='${project.version}'>
+        <feature version="${alisa-api.version}">alisa-api</feature>
+        <feature version="${alisa-spi.version}">alisa-spi</feature>
+        <feature>alisa-gemini-blueprint</feature>
+        <bundle>mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>
+        <config name="${osgi.configName}"/>
+    </feature>
+</features>

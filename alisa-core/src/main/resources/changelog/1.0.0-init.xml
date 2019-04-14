@@ -6,7 +6,7 @@
 
     <changeSet author="drudenko" id="1" objectQuotingStrategy="QUOTE_ALL_OBJECTS">
         <createTable tableName="tb_client">
-            <column name="id" type="VARCHAR(36)">
+            <column name="id" type="BIGSERIAL">
                 <constraints primaryKey="true" unique="true"/>
             </column>
             <column name="client_id" type="VARCHAR(200)">
@@ -21,7 +21,7 @@
 
     <changeSet author="drudenko" id="2" objectQuotingStrategy="QUOTE_ALL_OBJECTS">
         <createTable tableName="tb_otp">
-            <column name="id" type="VARCHAR(36)">
+            <column name="id" type="BIGSERIAL">
                 <constraints primaryKey="true" unique="true"/>
             </column>
             <column name="client_id" type="VARCHAR(200)">

@@ -13,7 +13,7 @@ import ru.drudenko.alisa.api.auth.TokenDto;
 @JsonIgnoreProperties
 @NoArgsConstructor
 @AllArgsConstructor
-class GmailCredentialsDto extends TokenDto {
+public class GmailCredentialsDto extends TokenDto {
     @JsonProperty(value = "token_type")
     private String tokenType;
     @JsonProperty(value = "access_token")
