@@ -21,6 +21,8 @@
     <bean id="otpRepository" class="ru.drudenko.alisa.core.model.repository.impl.OtpRepositoryImpl"/>
     <bean id="tokenRepository" class="ru.drudenko.alisa.core.model.repository.impl.TokenRepositoryImpl"/>
 
+    <bean id="velocityEngine" class="org.apache.velocity.app.VelocityEngine" init-method="init"/>
+
     <bean id="helpCommandService" class="ru.drudenko.alisa.core.service.impl.HelpCommandServiceImpl"/>
     <bean id="listCommandsCommandService" class="ru.drudenko.alisa.core.service.impl.ListCommandsCommandServiceImpl">
         <constructor-arg ref="commandServices"/>
@@ -50,6 +52,7 @@
     <bean id="oauthController" class="ru.drudenko.alisa.core.controller.impl.OauthControllerImpl">
         <constructor-arg ref="oauthClientServices"/>
         <constructor-arg ref="alisaService"/>
+        <constructor-arg ref="velocityEngine"/>
     </bean>
 
     <bean id="mainController" class="ru.drudenko.alisa.core.controller.impl.MainControllerImpl"/>

@@ -6,7 +6,7 @@
 
     <groupId>ru.drudenko</groupId>
     <artifactId>alisa-parent</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.3</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.osgi.version>1.2.1</spring.osgi.version>
@@ -19,7 +19,13 @@
         <javax.persistence-api.version>2.2</javax.persistence-api.version>
         <javax.transaction-api.version>1.3</javax.transaction-api.version>
         <osgi.core.version>7.0.0</osgi.core.version>
-
+        <velocity-bundle-version>1.7_6</velocity-bundle-version>
+        <commons-lang-version>2.6</commons-lang-version>
+        <commons-collections-version>3.2.2</commons-collections-version>
+        <jdom-bundle-version>1.1_4</jdom-bundle-version>
+        <ant-bundle-version>1.7.0_6</ant-bundle-version>
+        <antlr-bundle-version>3.5.2_1</antlr-bundle-version>
+        <oro-bundle-version>2.0.8_6</oro-bundle-version>
         <google-api-services-gmail.version>v1-rev98-${google-api-client.version}</google-api-services-gmail.version>
         <google-api-client.version>1.25.0</google-api-client.version>
         <mail.version>1.4.7</mail.version>
@@ -157,6 +163,11 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.velocity</artifactId>
+                <version>${velocity-bundle-version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
