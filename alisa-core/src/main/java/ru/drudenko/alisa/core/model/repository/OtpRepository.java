@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Transactional
-public interface OtpRepository extends Repository<Otp>{
+public interface OtpRepository extends Repository<Otp> {
 
     void deleteByRefAndType(String clientId, OtpType type);
 

@@ -11,6 +11,13 @@ import java.util.Optional;
 public abstract class AbstractRepository<T> implements Repository<T> {
     private static EntityManagerFactory entityManagerFactory = null;
 
+    static EntityManager openEntityManager() {
+        if (entityManagerFactory == null) {
+            entityManagerFactory = Persistence.createEntityManagerFactory("alisa");
+        }
+        return entityManagerFactory.createEntityManager();
+    }
+
     public Optional<T> findById(Object id) {
         return (Optional<T>) Optional.ofNullable(openEntityManager().find(getClazz(), id));
 
@@ -19,12 +26,5 @@ public abstract class AbstractRepository<T> implements Repository<T> {
     private Class getClazz() {
         ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
         return (Class<T>) genericSuperclass.getActualTypeArguments()[0];
-    }
-
-    static EntityManager openEntityManager() {
-        if (entityManagerFactory == null) {
-            entityManagerFactory = Persistence.createEntityManagerFactory("alisa");
-        }
-        return entityManagerFactory.createEntityManager();
     }
 }

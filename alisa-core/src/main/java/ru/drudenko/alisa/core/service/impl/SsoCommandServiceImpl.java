@@ -72,7 +72,7 @@ public class SsoCommandServiceImpl implements SsoCommandService {
     @Override
     public boolean doFilter(final Command command) {
         List<String> tokens = command.getRequest().getNlu().getTokens();
-        return tokens.containsAll(TOKENS_STEP1) || tokens.containsAll(TOKENS_STEP3_1)||tokens.containsAll(TOKENS_STEP3_2);
+        return tokens.containsAll(TOKENS_STEP1) || tokens.containsAll(TOKENS_STEP3_1) || tokens.containsAll(TOKENS_STEP3_2);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class SsoCommandServiceImpl implements SsoCommandService {
         if (tokens.containsAll(TOKENS_STEP1)) {
             return step1(command.getSession().getUserId());
         }
-        if (tokens.containsAll(TOKENS_STEP3_1)||tokens.containsAll(TOKENS_STEP3_2)) {
+        if (tokens.containsAll(TOKENS_STEP3_1) || tokens.containsAll(TOKENS_STEP3_2)) {
             String code = command.getRequest().getNlu().getEntities()
                     .stream()
                     .filter(entity -> entity.getType().equals("YANDEX.NUMBER"))
