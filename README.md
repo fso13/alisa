@@ -1,6 +1,6 @@
 ###### alisa-station
 
-
+karaf 4.2.x
 ```
 repo-add cxf
 repo-add pax-jdbc
