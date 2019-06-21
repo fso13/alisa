@@ -1,5 +1,6 @@
 package ru.drudenko.alisa.yandex.impl;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -9,15 +10,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import ru.drudenko.alisa.spi.OauthClient;
 import ru.drudenko.alisa.spi.OauthClientService;
 import ru.drudenko.alisa.yandex.YandexTokenResponseDto;
 
+@RestController
 public class YandexTokenExtractorImpl implements OauthClientService {
     private final RestTemplate restTemplate = restTemplate();
+    private final String clientId;
+    private final String clientSecret;
 
-    public YandexTokenExtractorImpl(final String clientId, final String clientSecret) {
+    public YandexTokenExtractorImpl(@Value("${app.yandex.client_id}") final String clientId, @Value("${app.yandex.client_secret}") final String clientSecret) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
     }
@@ -29,11 +34,6 @@ public class YandexTokenExtractorImpl implements OauthClientService {
         return new RestTemplate(httpRequestFactory);
     }
 
-    //    @Value("${app.yandex.client_id}")
-    private final String clientId;
-
-    //    @Value("${app.yandex.client_secret}")
-    private final String clientSecret;
 
     @Override
     public YandexTokenResponseDto getToken(final String code) {

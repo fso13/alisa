@@ -1,5 +1,6 @@
 package ru.drudenko.alisa.yandex.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import ru.drudenko.alisa.api.auth.AlisaClientService;
 import ru.drudenko.alisa.api.auth.TokenRequestDto;
@@ -19,6 +21,7 @@ import ru.drudenko.alisa.yandex.Passport;
 import java.util.Arrays;
 import java.util.List;
 
+@RestController
 public class YandexPassportCommandServiceImpl implements CommandService {
     private static final List<String> WHAT_IS_MY_NAME1 = Arrays.asList("как", "меня", "зовут");
     private static final List<String> WHAT_IS_MY_NAME2 = Arrays.asList("скажи", "мое", "имя");
@@ -26,6 +29,7 @@ public class YandexPassportCommandServiceImpl implements CommandService {
     private final AlisaClientService alisaClientService;
     private final RestTemplate restTemplate = restTemplate();
 
+    @Autowired
     public YandexPassportCommandServiceImpl(final AlisaClientService alisaClientService) {
         this.alisaClientService = alisaClientService;
     }
