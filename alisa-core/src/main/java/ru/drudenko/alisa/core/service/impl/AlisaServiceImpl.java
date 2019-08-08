@@ -1,7 +1,8 @@
 package ru.drudenko.alisa.core.service.impl;
 
 import ru.drudenko.alisa.api.auth.AlisaClientService;
-import ru.drudenko.alisa.api.auth.TokenDto;
+import ru.drudenko.alisa.api.auth.TokenRequestDto;
+import ru.drudenko.alisa.api.auth.TokenResponseDto;
 import ru.drudenko.alisa.api.dialog.CommandService;
 import ru.drudenko.alisa.api.dialog.dto.req.Command;
 import ru.drudenko.alisa.core.model.AlisaClient;
@@ -54,7 +55,7 @@ public class AlisaServiceImpl implements AlisaService, AlisaClientService {
     }
 
     @Override
-    public String generationOtp(String state, OauthClient client, TokenDto tokenDto) {
+    public String generationOtp(String state, OauthClient client, TokenResponseDto tokenResponseDto) {
 
         Otp otp = otpRepository.findByValueAndExpiredAndType(state.trim(), false, OtpType.ALISA_STATION).orElseThrow(RuntimeException::new);
         AlisaClient alisaClient = alisaClientRepository.findById(otp.getRef()).orElseThrow(RuntimeException::new);
@@ -70,8 +71,8 @@ public class AlisaServiceImpl implements AlisaService, AlisaClientService {
                     return t;
                 });
 
-        token.setAccessToken(tokenDto.getAccessToken());
-        token.setRefreshToken(tokenDto.getRefreshToken());
+        token.setAccessToken(tokenResponseDto.getAccessToken());
+        token.setRefreshToken(tokenResponseDto.getRefreshToken());
         token = tokenRepository.save(token);
         String otpByClient = RandomUtils.getOtp();
         Otp newOtp = new Otp();
@@ -84,12 +85,12 @@ public class AlisaServiceImpl implements AlisaService, AlisaClientService {
     }
 
     @Override
-    public TokenDto getTokenByUserIdAndOauthClient(final String userId, final String oauthClient) {
-        return alisaClientRepository.findById(userId).get()
+    public TokenResponseDto getTokenByUserIdAndOauthClient(TokenRequestDto tokenRequestDto) {
+        return alisaClientRepository.findById(tokenRequestDto.getUserId()).get()
                 .getTokens()
                 .stream()
-                .filter(token1 -> token1.getOauthClient().equals(oauthClient))
+                .filter(token1 -> token1.getOauthClient().equals(tokenRequestDto.getOauthClient()))
                 .findFirst()
-                .map(token -> new TokenDto(token.getAccessToken(), token.getRefreshToken())).orElse(null);
+                .map(token -> new TokenResponseDto(token.getAccessToken(), token.getRefreshToken())).orElse(null);
     }
 }

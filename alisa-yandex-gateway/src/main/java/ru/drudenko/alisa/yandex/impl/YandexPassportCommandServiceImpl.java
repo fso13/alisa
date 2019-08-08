@@ -10,7 +10,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import ru.drudenko.alisa.api.auth.AlisaClientService;
-import ru.drudenko.alisa.api.auth.TokenDto;
+import ru.drudenko.alisa.api.auth.TokenRequestDto;
+import ru.drudenko.alisa.api.auth.TokenResponseDto;
 import ru.drudenko.alisa.api.dialog.CommandService;
 import ru.drudenko.alisa.api.dialog.dto.req.Command;
 import ru.drudenko.alisa.yandex.Passport;
@@ -48,7 +49,8 @@ public class YandexPassportCommandServiceImpl implements CommandService {
     }
 
     private String whatIsMyName(String clientId) {
-        TokenDto token = alisaClientService.getTokenByUserIdAndOauthClient(clientId, "yandex");
+        TokenRequestDto tokenRequestDto = TokenRequestDto.builder().oauthClient(clientId).userId("yandex").build();
+        TokenResponseDto token = alisaClientService.getTokenByUserIdAndOauthClient(tokenRequestDto);
 
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         HttpHeaders headers = new HttpHeaders();

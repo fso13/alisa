@@ -12,7 +12,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import ru.drudenko.alisa.spi.OauthClient;
 import ru.drudenko.alisa.spi.OauthClientService;
-import ru.drudenko.alisa.yandex.YandexTokenDto;
+import ru.drudenko.alisa.yandex.YandexTokenResponseDto;
 
 public class YandexTokenExtractorImpl implements OauthClientService {
     private final RestTemplate restTemplate = restTemplate();
@@ -36,7 +36,7 @@ public class YandexTokenExtractorImpl implements OauthClientService {
     private final String clientSecret;
 
     @Override
-    public YandexTokenDto getToken(final String code) {
+    public YandexTokenResponseDto getToken(final String code) {
 
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("grant_type", "authorization_code");
@@ -48,11 +48,11 @@ public class YandexTokenExtractorImpl implements OauthClientService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
-        ResponseEntity<YandexTokenDto> responseEntity = restTemplate.
+        ResponseEntity<YandexTokenResponseDto> responseEntity = restTemplate.
                 exchange("https://oauth.yandex.ru/token",
                         HttpMethod.POST,
                         request,
-                        ParameterizedTypeReference.forType(YandexTokenDto.class));
+                        ParameterizedTypeReference.forType(YandexTokenResponseDto.class));
 
         return responseEntity.getBody();
     }

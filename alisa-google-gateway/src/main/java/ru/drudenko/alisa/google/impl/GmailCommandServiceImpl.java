@@ -12,9 +12,11 @@ import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
 import org.springframework.beans.factory.annotation.Value;
 import ru.drudenko.alisa.api.auth.AlisaClientService;
-import ru.drudenko.alisa.api.auth.TokenDto;
+import ru.drudenko.alisa.api.auth.TokenRequestDto;
+import ru.drudenko.alisa.api.auth.TokenResponseDto;
 import ru.drudenko.alisa.api.dialog.dto.req.Command;
 import ru.drudenko.alisa.google.GmailCommandService;
+import ru.drudenko.alisa.google.configuration.GoogleSettings;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -22,34 +24,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class GmailCommandServiceImpl implements GmailCommandService {
-    @Value("${app.google.client_id}")
-    private String client_id;
-    @Value("${app.google.client_secret}")
-    private String client_secret;
-
     private static final List<String> EMAIL = Arrays.asList("получи", "почту");
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-
+    private final GoogleSettings googleSettings;
     private final AlisaClientService alisaClientService;
 
-    public GmailCommandServiceImpl(final AlisaClientService alisaClientService) throws GeneralSecurityException, IOException {
+    public GmailCommandServiceImpl(final GoogleSettings googleSettings,
+                                   final AlisaClientService alisaClientService) throws GeneralSecurityException, IOException {
+        this.googleSettings = googleSettings;
         this.alisaClientService = alisaClientService;
-    }
-
-
-    private static Credential convertToGoogleCredential(String accessToken, String refreshToken, String apiSecret, String apiKey) {
-        HttpTransport httpTransport = new NetHttpTransport();
-        JsonFactory jsonFactory = new JacksonFactory();
-        GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport).setJsonFactory(jsonFactory).setClientSecrets(apiKey, apiSecret).build();
-        credential.setAccessToken(accessToken);
-        credential.setRefreshToken(refreshToken);
-        try {
-            credential.refreshToken();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return credential;
     }
 
     @Override
@@ -66,7 +50,8 @@ public final class GmailCommandServiceImpl implements GmailCommandService {
     @Override
     public String getMessage(final Command command) {
         try {
-            TokenDto token = alisaClientService.getTokenByUserIdAndOauthClient(command.getSession().getUserId(), "google");
+            TokenRequestDto tokenRequestDto = TokenRequestDto.builder().oauthClient(command.getSession().getUserId()).userId("google").build();
+            TokenResponseDto token = alisaClientService.getTokenByUserIdAndOauthClient(tokenRequestDto);
             return getMessages(token.getAccessToken(), token.getRefreshToken());
         } catch (IOException e) {
             e.printStackTrace();
@@ -75,7 +60,8 @@ public final class GmailCommandServiceImpl implements GmailCommandService {
     }
 
     private String getMessages(final String token, final String refresh) throws IOException {
-        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, convertToGoogleCredential(token, refresh, client_secret, client_id)).build();
+        Credential credential = convertToGoogleCredential(token, refresh, googleSettings.getClient_secret(), googleSettings.getClient_id());
+        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
         String user = "me";
         ListMessagesResponse listResponse = service.users().messages().list(user).execute();
         List<Message> messages = listResponse.getMessages();
@@ -85,4 +71,18 @@ public final class GmailCommandServiceImpl implements GmailCommandService {
             return "Новых сообщений - " + (messages.size() + listResponse.getResultSizeEstimate());
         }
     }
+    private static Credential convertToGoogleCredential(String accessToken, String refreshToken, String apiSecret, String apiKey) {
+        HttpTransport httpTransport = new NetHttpTransport();
+        JsonFactory jsonFactory = new JacksonFactory();
+        GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport).setJsonFactory(jsonFactory).setClientSecrets(apiKey, apiSecret).build();
+        credential.setAccessToken(accessToken);
+        credential.setRefreshToken(refreshToken);
+        try {
+            credential.refreshToken();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return credential;
+    }
+
 }

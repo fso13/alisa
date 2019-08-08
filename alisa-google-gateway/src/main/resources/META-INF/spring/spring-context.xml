@@ -12,14 +12,19 @@
 
     <context:component-scan base-package="ru.drudenko.alisa.google"/>
 
+    <bean id="googleSettings" class="ru.drudenko.alisa.google.configuration.GoogleSettings">
+        <constructor-arg value="${app.google.client_id}"/>
+        <constructor-arg value="${app.google.client_secret}"/>
+        <constructor-arg value="${app.google.redirect_url}"/>
+    </bean>
+
     <bean id="gmailCommandService" class="ru.drudenko.alisa.google.impl.GmailCommandServiceImpl">
+        <constructor-arg ref="googleSettings"/>
         <constructor-arg ref="alisaClientService"/>
     </bean>
 
     <bean id="googleTokenExtractor" class="ru.drudenko.alisa.google.impl.GoogleTokenExtractorImpl">
-        <constructor-arg value="${app.google.client_id}"/>
-        <constructor-arg value="${app.google.client_secret}"/>
-        <constructor-arg value="${app.google.redirect_url}"/>
+        <constructor-arg ref="googleSettings"/>
     </bean>
 
 </beans>

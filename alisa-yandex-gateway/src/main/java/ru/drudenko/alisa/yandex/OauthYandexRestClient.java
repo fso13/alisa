@@ -5,5 +5,5 @@ import javax.ws.rs.POST;
 public interface OauthYandexRestClient {
 
     @POST
-    YandexTokenDto getToken();
+    YandexTokenResponseDto getToken();
 }

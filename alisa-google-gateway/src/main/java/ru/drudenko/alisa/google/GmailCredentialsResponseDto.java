@@ -6,14 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.drudenko.alisa.api.auth.TokenDto;
+import ru.drudenko.alisa.api.auth.TokenResponseDto;
 
 @Getter
 @Setter
 @JsonIgnoreProperties
 @NoArgsConstructor
 @AllArgsConstructor
-public class GmailCredentialsDto extends TokenDto {
+public class GmailCredentialsResponseDto extends TokenResponseDto {
     @JsonProperty(value = "token_type")
     private String tokenType;
     @JsonProperty(value = "access_token")

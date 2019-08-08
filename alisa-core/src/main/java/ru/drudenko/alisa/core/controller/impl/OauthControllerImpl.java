@@ -3,7 +3,7 @@ package ru.drudenko.alisa.core.controller.impl;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import ru.drudenko.alisa.api.auth.TokenDto;
+import ru.drudenko.alisa.api.auth.TokenResponseDto;
 import ru.drudenko.alisa.core.controller.OauthController;
 import ru.drudenko.alisa.core.service.AlisaService;
 import ru.drudenko.alisa.spi.OauthClient;
@@ -31,13 +31,13 @@ public class OauthControllerImpl implements OauthController {
     public Response oauth(String agentId, String state, String code) throws Exception {
         OauthClient client = OauthClient.builder().name(agentId).build();
 
-        TokenDto tokenDto = oauthClientServices.stream()
+        TokenResponseDto tokenResponseDto = oauthClientServices.stream()
                 .filter(oauthClientService -> oauthClientService.getOauthClient().equals(client))
                 .findFirst()
                 .get()
                 .getToken(code);
 
-        String otpByClient = alisaService.generationOtp(state, client, tokenDto);
+        String otpByClient = alisaService.generationOtp(state, client, tokenResponseDto);
 
 
         Template t = velocityEngine.getTemplate("src/main/resources/templates/code.html", "utf-8");

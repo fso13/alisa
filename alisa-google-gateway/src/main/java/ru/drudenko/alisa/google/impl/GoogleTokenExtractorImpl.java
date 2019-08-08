@@ -1,6 +1,5 @@
 package ru.drudenko.alisa.google.impl;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -10,24 +9,18 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import ru.drudenko.alisa.google.GmailCredentialsDto;
+import ru.drudenko.alisa.google.GmailCredentialsResponseDto;
+import ru.drudenko.alisa.google.configuration.GoogleSettings;
 import ru.drudenko.alisa.spi.OauthClient;
 import ru.drudenko.alisa.spi.OauthClientService;
 
-public class GoogleTokenExtractorImpl implements OauthClientService {
+public final class GoogleTokenExtractorImpl implements OauthClientService {
     private final RestTemplate restTemplate = restTemplate();
 
-    @Value("${app.google.client_id}")
-    private String client_id;
-    @Value("${app.google.client_secret}")
-    private String client_secret;
+    private final GoogleSettings googleSettings;
 
-    public GoogleTokenExtractorImpl(final String clientId,
-                                    final String clientSecret,
-                                    final String redirectUrl) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.redirectUrl = redirectUrl;
+    public GoogleTokenExtractorImpl(final GoogleSettings googleSettings) {
+        this.googleSettings = googleSettings;
     }
 
     private static RestTemplate restTemplate() {
@@ -37,28 +30,24 @@ public class GoogleTokenExtractorImpl implements OauthClientService {
         return new RestTemplate(httpRequestFactory);
     }
 
-    private final String clientId;
-    private final String clientSecret;
-    private final String redirectUrl;
-
     @Override
-    public GmailCredentialsDto getToken(final String code) {
+    public GmailCredentialsResponseDto getToken(final String code) {
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("grant_type", "authorization_code");
-        map.add("redirect_uri", redirectUrl);
-        map.add("client_secret", clientSecret);
-        map.add("client_id", clientId);
+        map.add("redirect_uri", googleSettings.getRedirect_url());
+        map.add("client_secret", googleSettings.getClient_secret());
+        map.add("client_id", googleSettings.getClient_id());
         map.add("code", code);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
 
-        return (GmailCredentialsDto) restTemplate.
+        return (GmailCredentialsResponseDto) restTemplate.
                 exchange("https://www.googleapis.com/oauth2/v4/token",
                         HttpMethod.POST,
                         request,
-                        ParameterizedTypeReference.forType(GmailCredentialsDto.class)).getBody();
+                        ParameterizedTypeReference.forType(GmailCredentialsResponseDto.class)).getBody();
 
     }
 

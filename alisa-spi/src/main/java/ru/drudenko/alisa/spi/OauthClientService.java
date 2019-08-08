@@ -1,10 +1,10 @@
 package ru.drudenko.alisa.spi;
 
 
-import ru.drudenko.alisa.api.auth.TokenDto;
+import ru.drudenko.alisa.api.auth.TokenResponseDto;
 
 public interface OauthClientService {
-    TokenDto getToken(String code) throws Exception;
+    TokenResponseDto getToken(String code) throws Exception;
 
     OauthClient getOauthClient();
 }

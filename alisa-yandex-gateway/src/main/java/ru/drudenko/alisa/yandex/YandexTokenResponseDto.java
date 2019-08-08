@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.drudenko.alisa.api.auth.TokenDto;
+import ru.drudenko.alisa.api.auth.TokenResponseDto;
 
 @Getter
 @Setter
@@ -14,7 +14,7 @@ import ru.drudenko.alisa.api.auth.TokenDto;
 @NoArgsConstructor
 @AllArgsConstructor
 public
-class YandexTokenDto extends TokenDto {
+class YandexTokenResponseDto extends TokenResponseDto {
 
     @JsonProperty(value = "token_type")
     private String tokenType;
